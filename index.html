@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>우리는 별에서 왔습니다 - EXHIBITION 2026</title>
+<style>
+  body {
+    font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    padding: 20px;
+  }
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .title {
+    font-weight: bold;
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  .kakao-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+  }
+  .kakao-button {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    background-color: #FEE500;
+    border-radius: 4px;
+    padding: 8px 12px;
+    border: none;
+  }
+  .talk-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+  }
+  .error-message {
+    color: red;
+    margin-top: 10px;
+    display: none;
+    font-size: 14px;
+  }
+  .preview-image {
+    max-width: 250px;
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- 제목 -->
+  <div class="title"><h1>우리는 별에서 왔습니다</h1></div>
+
+  <!-- 썸네일 미리보기: 실제 전시회 포스터 이미지 URL로 교체 필요 -->
+  <img class="preview-image" src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2Fdg9xzL%2FdJMcafnxlEB%2FAAAAAAAAAAAAAAAAAAAAAE0-390u27U4_tLZNVYR8be727saD1kGv8LuePjJS3jI%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1788188399%26allow_ip%3D%26allow_referer%3D%26signature%3DE81neCU26Y8V8Oa4K6Ga7l%252FvrWs%253D" alt="전시회 포스터" style="width:100%; height:auto;">
+
+  <!-- 카카오톡 버튼 -->
+  <div class="kakao-buttons">
+    <button class="kakao-button" onclick="sendTemplateLink()" style="width:70%; height:auto;">
+      <img src="https://developers.kakao.com/assets/img/about/logos/kakaolink/kakaolink_btn_small.png" alt="카카오톡 템플릿 공유" class="talk-icon" style="width:30%; height:auto;">
+      <h1>카카오톡 공유하기</h1>
+    </button>
+  </div>
+
+  <!-- 오류 메시지 표시 영역 -->
+  <div id="error-message" class="error-message"></div>
+</div>
+
+<!-- Kakao SDK를 body 끝부분에 로드 -->
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.5.0/kakao.min.js"
+      integrity="sha384-kYPsUbBPlktXsY6/oNHSUDZoTX6+YI51f63jCPEIPFP09ttByAdxd2mEjKuhdqn4"
+      crossorigin="anonymous"></script>
+
+<script type="text/javascript">
+  // ===== 설정값 =====
+  // 자바스크립트 키 (Kakao Developers > 앱 설정 > 요약정보)
+  const JS_KEY = 'f549bb55a15e8001372380696ca5bcb0';
+
+  // 메시지 템플릿 ID (사용자님이 알려주신 ID)
+  const TEMPLATE_ID = 1554272;
+
+  // 참고용: 전시회 안내 페이지 / 포스터 이미지 URL
+  // (실제 카카오 공유 내용은 템플릿(ID 1554272)에 이미 고정 저장되어 있어
+  //  아래 두 값은 sendCustom 호출에는 사용되지 않고, 이 페이지 자체의
+  //  썸네일 미리보기(위 <img> 태그)에만 쓰입니다.)
+  const EXHIBITION_URL = 'https://daroo2314.github.io/norman/';
+  const IMAGE_URL = 'https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdna%2Fdg9xzL%2FdJMcafnxlEB%2FAAAAAAAAAAAAAAAAAAAAAE0-390u27U4_tLZNVYR8be727saD1kGv8LuePjJS3jI%2Fimg.png%3Fcredential%3DyqXZFxpELC7KVnFOS48ylbz2pIh7yKj8%26expires%3D1788188399%26allow_ip%3D%26allow_referer%3D%26signature%3DE81neCU26Y8V8Oa4K6Ga7l%252FvrWs%253D';
+
+  // 에러 표시 함수
+  function showError(message) {
+    const errorElement = document.getElementById('error-message');
+    if (errorElement) {
+      errorElement.innerText = message;
+      errorElement.style.display = 'block';
+    }
+    console.error('에러:', message);
+  }
+
+  // Kakao SDK 초기화 함수
+  let kakaoInitialized = false;
+
+  function initKakao() {
+    if (kakaoInitialized) return true;
+
+    try {
+      if (!Kakao) {
+        showError('Kakao SDK가 로드되지 않았습니다.');
+        return false;
+      }
+
+      if (Kakao.isInitialized()) {
+        kakaoInitialized = true;
+        return true;
+      }
+
+      Kakao.init(JS_KEY);
+      kakaoInitialized = Kakao.isInitialized();
+
+      if (!kakaoInitialized) {
+        showError('Kakao SDK 초기화에 실패했습니다.');
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      showError('Kakao SDK 초기화 중 오류 발생: ' + e.message);
+      return false;
+    }
+  }
+
+  // 템플릿 공유하기 함수
+  function sendTemplateLink() {
+    if (!initKakao()) return;
+
+    try {
+      // 이 템플릿(ID 1554272)은 이미지/제목/본문/버튼/출처링크가 모두
+      // 카카오 개발자센터 템플릿 편집 화면에 "공통 링크"로 고정 저장되어 있어서
+      // templateArgs 없이 templateId만 전달하면 됩니다.
+      Kakao.Share.sendCustom({
+        templateId: TEMPLATE_ID
+        // 만약 전달(공유) 횟수를 추적하는 ${FW} 값을 사용하고 싶다면 아래처럼 추가:
+        // templateArgs: { 'FW': 'share_source_value' }
+      });
+    } catch (e) {
+      showError('템플릿 공유하기 실패: ' + e.message);
+    }
+  }
+</script>
+</body>
+</html>
